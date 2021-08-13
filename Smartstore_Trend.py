@@ -11,27 +11,27 @@ header = { # 유저의 정보를 입력(차단을 막기 위함)
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36',
     'referer': 'https://datalab.naver.com/shoppingInsight/sCategory.naver'
 }
-#-------------------------Setting
+#-------------------------Setting------------------------
 res_index=0
 stdValue = {}
-firstCid=186  # 탐색을 시작할 cid 값
-secondCid=189  # 탐색을 종료할 cid 값 | cidStart와 cidEnd를 같은 값으로 입력 시 오류 발생
+firstCid=181  # 탐색을 시작할 cid 값
+secondCid=188  # 탐색을 종료할 cid 값 | cidStart와 cidEnd를 같은 값으로 입력 시 오류 발생
 cont='y'
 rangeDate = 3 # 탐색 기간(일)
 now = datetime.now() # 현재 시간
 startDate = (now - timedelta(days=rangeDate+1)).strftime('%Y-%m-%d') # 오늘 날짜에서 rangeDate+1만큼 뺌
 endDate = (now - timedelta(days=1)).strftime('%Y-%m-%d') # 오늘 날짜에서 1만큼 뺌
+#--------------------------------------------------------
 
-#---------------------------------
 
-
+#--------------------------------------------------------
 def crawling(firstCid, secondCid, rangeDate, res_index): #res_index: 구하고자 하는 res 내 인덱스 값
     wrapData={}
     try: # cid가 없는 경우 index error 발생 ==> index error 발생 시 pass
         data={"cid": [50000000+firstCid, 50000000+secondCid], "timeUnit": "date", "startDate": startDate, "endDate": endDate} # form값을 입력
         Fdata = requests.post(url, headers=header, data=data) # url에 url 정보를 넣고, headers(유저의 정보)에 header변수를, data에 data(입력된 form값)을 전송 후 데이터 요청
         if Fdata.status_code == requests.codes.ok:
-            print("try")
+            # print("try")
             res = json.loads(Fdata.text)["result"] #json.loads는 json 문자열을 파이썬 객체로 변환/ 반대로 json.dumps()는 파이썬 객체를 json 문자열로 변환
             code = res[res_index]["code"]
             title = res[res_index]["title"]
@@ -60,12 +60,9 @@ def crawling(firstCid, secondCid, rangeDate, res_index): #res_index: 구하고�
             return
     except: # index error 발생 시 pass
         return
-
-
-
-print("기간 :", startDate, "~", endDate) # 기간 표시
-frst=crawling(firstCid, secondCid, rangeDate, 0)
+#----------------------------------------------------------
 if cont=="y":
+    frst=crawling(firstCid, secondCid, rangeDate, 0)
     if frst:
         for i in range(firstCid, secondCid):
             b=crawling(firstCid, i+1, rangeDate, 1)
@@ -86,18 +83,14 @@ if cont=="y":
     else:
         print("카테고리 a가 존재하지 않음")
 elif cont=="n":
-    if frst:
-        b=crawling(firstCid, secondCid, rangeDate, 1)
-        if b:
-            if frst!="done":
-                a=crawling(firstCid, secondCid, rangeDate, 0)
-                for index in range(0, rangeDate):
-                    print(a[index])
-                frst="done"
-            print("-"*110) # ---------------------------------카테고리별 구분선
-            for index in range(0, rangeDate):
+    a=crawling(firstCid, secondCid, rangeDate, 0)
+    b=crawling(firstCid, secondCid, rangeDate, 1)
+    for i in range(0,2):
+        for index in range(0, rangeDate):
+            if i==0:
+                print(a[index])
+            else:
                 print(b[index])
-        elif not b:
-            print("카테고리 b가 존재하지 않음")
-    else:
-        print("카테고리 a가 존재하지 않음")
+        if i==0:   
+            print("-"*110) # ---------------------------------카테고리별 구분선
+print("[기간 :", startDate, "~", endDate+"]") # 기간 표시
