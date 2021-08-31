@@ -10,7 +10,7 @@ import copy     # copy 모듈을 가져옴
 
 
 #---------------------- 설정값 --------------------------
-excelPath='네이버 통계1.xlsx'
+excelPath='네이버 통계.xlsx'
 #--------------------------------------------------------
 
 #-----------------------기본값---------------------------
@@ -89,6 +89,7 @@ def SavetoExcel(data, index):
 def surveyData():
     total=[]
     overseas=[]
+    fcnt=0
     df = pd.read_excel(excelPath, sheet_name=None)
     for i in range(0,df['Data'].shape[0]):
         try:
